@@ -24,6 +24,9 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include <unistd.h>
+#include <sys/resource.h>
+
 #include "common_dht_read.h"
 
 void busy_wait_milliseconds(uint32_t millis) {
@@ -55,6 +58,8 @@ void set_max_priority(void) {
   // Use FIFO scheduler with highest priority for the lowest chance of the kernel context switching.
   sched.sched_priority = sched_get_priority_max(SCHED_FIFO);
   sched_setscheduler(0, SCHED_FIFO, &sched);
+
+  setpriority(PRIO_PROCESS, getpid(), -20);
 }
 
 void set_default_priority(void) {
@@ -63,4 +68,6 @@ void set_default_priority(void) {
   // Go back to default scheduler with default 0 priority.
   sched.sched_priority = 0;
   sched_setscheduler(0, SCHED_OTHER, &sched);
+
+  setpriority(PRIO_PROCESS, getpid(), 0);
 }
