@@ -20,6 +20,7 @@
 // SOFTWARE.
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "pi_2_dht_read.h"
 #include "pi_2_mmio.h"
@@ -58,9 +59,9 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
   // Bump up process priority and change scheduler to try to try to make process more 'real time'.
   set_max_priority();
 
-  // Set pin high for ~500 milliseconds.
+  // Set pin high for ~20 milliseconds.
   pi_2_mmio_set_high(pin);
-  sleep_milliseconds(500);
+  sleep_milliseconds(20);
 
   // The next calls are timing critical and care should be taken
   // to ensure no unnecssary work is done below.
@@ -71,12 +72,19 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
 
   // Set pin at input.
   pi_2_mmio_set_input(pin);
-  // Need a very short delay before reading pins or else value is sometimes still low.
-  for (volatile int i = 0; i < 50; ++i) {
+
+  // Wait for DHT to pull pin high.
+  uint32_t count = 0;
+  while (!pi_2_mmio_input(pin)) {
+    if (++count >= DHT_MAXCOUNT) {
+      // Timeout waiting for response.
+      set_default_priority();
+      return DHT_ERROR_TIMEOUT;
+    }
   }
 
   // Wait for DHT to pull pin low.
-  uint32_t count = 0;
+  count = 0;
   while (pi_2_mmio_input(pin)) {
     if (++count >= DHT_MAXCOUNT) {
       // Timeout waiting for response.
