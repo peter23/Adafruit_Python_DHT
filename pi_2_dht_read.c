@@ -59,9 +59,9 @@ int pi_2_dht_read(int type, int pin, float* humidity, float* temperature) {
   // Bump up process priority and change scheduler to try to try to make process more 'real time'.
   set_max_priority();
 
-  // Set pin high for ~20 milliseconds.
+  // Set pin high for ~500 milliseconds.
   pi_2_mmio_set_high(pin);
-  sleep_milliseconds(20);
+  sleep_milliseconds(500);
 
   // The next calls are timing critical and care should be taken
   // to ensure no unnecssary work is done below.
