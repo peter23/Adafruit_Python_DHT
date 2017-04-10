@@ -10,15 +10,27 @@
 int main(int argc, char **argv) {
 	//get specified pin from arguments
 	int SIGNAL_PIN = -1;
-	if(argc == 2) {
+	int SENSOR_TYPE = -1;
+	if(argc >= 2) {
 		char *end;
 		SIGNAL_PIN = strtol(argv[1], &end, 10);
 		if(strlen(end) != 0) {
 			SIGNAL_PIN = -1;
 		}
+		if(argc >= 3) {
+			char *end;
+			SENSOR_TYPE = strtol(argv[2], &end, 10);
+			if((SENSOR_TYPE != 11) && (SENSOR_TYPE != 22)) {
+				SENSOR_TYPE = -1;
+			}
+		}
 	}
 	if(SIGNAL_PIN == -1) {
 		printf("Please specify pin!\n");
+		exit(-1);
+	}
+	if(SENSOR_TYPE == -1) {
+		printf("Please specify sensor type (11/22)!\n");
 		exit(-1);
 	}
 
@@ -44,7 +56,7 @@ int main(int argc, char **argv) {
 
 	//read data
 	float humidity = 0, temperature = 0;
-	int result = pi_2_dht_read(DHT22, SIGNAL_PIN, &humidity, &temperature);
+	int result = pi_2_dht_read(SENSOR_TYPE, SIGNAL_PIN, &humidity, &temperature);
 
 	//out data
 	printf("DHT out\tTemp:\t%f\tHumidity:\t%f\n", temperature, humidity);
