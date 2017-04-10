@@ -13,7 +13,7 @@ objects = pi_2_mmio.o common_dht_read.o pi_2_dht_read.o
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 # The default rule - compiling our main program:
-all:	dht_get pin_on pin_off
+all:	dht_get pin_on pin_off pin_get
 		echo all: make complete
 
 dht_get: dht_get.o $(objects)
@@ -23,6 +23,9 @@ pin_on: pin_on.o $(objects)
 	$(CC) -o $@ $+ $(CFLAGS)
 
 pin_off: pin_off.o $(objects)
+	$(CC) -o $@ $+ $(CFLAGS)
+
+pin_get: pin_get.o $(objects)
 	$(CC) -o $@ $+ $(CFLAGS)
 
 .PHONY: clean
